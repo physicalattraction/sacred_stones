@@ -22,16 +22,20 @@ class Tile(pygame.sprite.Sprite, ABC):
         super().__init__()
         self.x = x
         self.y = y
-        self.image = self._load_image()
+        self.image = self._load_image(self.image_name)
         self.place_on_screen(constants.TILESIZE, x, y)
+
+    @property
+    def image_name(self) -> str:
+        return self.IMAGE
 
     def place_on_screen(self, tilesize: int, x: int, y: int):
         self.image = pygame.transform.scale(self.image, (tilesize, tilesize))
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(x * tilesize, y * tilesize)
 
-    def _load_image(self, image_name: str = None) -> pygame.Surface:
-        filepath = os.path.join(DATA_DIR, 'images', image_name or self.IMAGE)
+    def _load_image(self, image_name: str) -> pygame.Surface:
+        filepath = os.path.join(DATA_DIR, 'images', image_name)
         try:
             return pygame.image.load(filepath).convert_alpha()
         except Exception as e:
@@ -39,11 +43,11 @@ class Tile(pygame.sprite.Sprite, ABC):
             raise ValueError(s) from e
 
 
-class Wall(Tile):
+class Obstacle(Tile):
     IMAGE = constants.WALL_IMG
 
 
-class Grass(Tile):
+class Walkable(Tile):
     IMAGE = constants.GRASS_IMG
 
 
@@ -62,8 +66,6 @@ class Creature(Tile, ABC):
     def __init__(self, name: str, kind: str, armor: int, max_damage: int,
                  chance_to_hit: int, max_hit_points: int, hit_points: int,
                  *args, **kwargs):
-        if not self.IMAGE_DEAD:
-            self.IMAGE_DEAD = self.IMAGE
         self.name = name
         self.kind = kind
         self.armor = armor
@@ -76,14 +78,6 @@ class Creature(Tile, ABC):
     def calculate_damage(self, enemy: 'Creature') -> int:
         # TODO: More sophisticated way to calculate damage
         return self.max_damage - enemy.armor
-
-    def take_hit(self, damage: int):
-        self.hit_points -= damage
-        if self.hit_points <= 0:
-            self.die()
-
-    def die(self):
-        self.image = self._load_image(self.IMAGE_DEAD)
 
     def is_dead(self):
         return self.hit_points <= 0
@@ -108,16 +102,14 @@ class Creature(Tile, ABC):
     def load(cls) -> 'Creature':
         filepath = os.path.join(DATA_DIR, cls.DATA_FILE)
         with open(filepath, 'r') as f:
-            x = json.load(f)
-            from pprint import pprint
-            pprint(x)
-            return cls.from_json(x)
+            return cls.from_json(json.load(f))
 
-    def _load_image(self) -> pygame.Surface:
+    @property
+    def image_name(self) -> str:
         if self.is_dead():
-            return super()._load_image(self.IMAGE_DEAD)
+            return self.IMAGE_DEAD or self.IMAGE
         else:
-            return super()._load_image(self.IMAGE)
+            return self.IMAGE
 
 
 class OrientedTile(Tile, ABC):
@@ -138,18 +130,17 @@ class Player(OrientedTile, Creature):
     IMAGE_DEAD = constants.PLAYER_IMG_DEAD
     DATA_FILE = constants.PLAYER_DATA_FILE  # TODO: Remove this dependency
 
-    def move(self, direction: Direction, walls: List[Wall]):
+    def move(self, direction: Direction, obstacles: List[Obstacle]):
         # First rotate the image, then move the iamge
         self.orient_towards(direction)
         dx, dy = convert_direction_to_dx_dy(direction)
-        if not self._collide_with_walls(dx, dy, walls):
+        if not self._collide_with_obstacles(dx, dy, obstacles):
             self.x += dx
             self.y += dy
             self.rect = self.rect.move(dx * constants.TILESIZE, dy * constants.TILESIZE)
-            # talk_dialog()
 
-    def _collide_with_walls(self, dx: int, dy: int, walls: List[Wall]) -> bool:
-        return any(wall.x == self.x + dx and wall.y == self.y + dy for wall in walls)
+    def _collide_with_obstacles(self, dx: int, dy: int, obstacles: List[Obstacle]) -> bool:
+        return any(obstacle.x == self.x + dx and obstacle.y == self.y + dy for obstacle in obstacles)
 
 
 class Monster(Creature):
