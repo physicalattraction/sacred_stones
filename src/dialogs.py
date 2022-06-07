@@ -205,3 +205,6 @@ class DialogFight:
         while self.keep_looping:
             self.handle_events()
             self.draw()
+        # TODO: Don't call private methods in this dialog, and especially not in main
+        self.monster.image = self.monster._load_image(self.monster.image_name)
+        self.monster.place_on_screen(constants.TILESIZE, self.monster.x, self.monster.y)

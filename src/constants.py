@@ -1,16 +1,6 @@
-# NR_BLOCKS_WIDE = 12
-# NR_BLOCKS_HIGH = 12
-# BLOCK_WIDTH = 40
-# BLOCK_HEIGHT = 40
-# SCREEN_WIDTH = NR_BLOCKS_WIDE * BLOCK_WIDTH
-# SCREEN_HEIGHT = NR_BLOCKS_HIGH * BLOCK_HEIGHT
+import os.path
 
-# SCREEN_WIDTH = 480
-# SCREEN_HEIGHT = 480
-# NUMBER_OF_BLOCKS_WIDE = 12
-# NUMBER_OF_BLOCKS_HIGH = 12
-# BLOCK_HEIGHT = round(SCREEN_HEIGHT/NUMBER_OF_BLOCKS_HIGH)
-# BLOCK_WIDTH = round(SCREEN_WIDTH/NUMBER_OF_BLOCKS_WIDE)
+TITLE = 'Sacred Stones'
 
 TILESIZE = 52
 NR_BLOCKS_WIDE = 20
@@ -18,8 +8,6 @@ NR_BLOCKS_HIGH = 16
 WIDTH = TILESIZE * NR_BLOCKS_WIDE
 HEIGHT = TILESIZE * NR_BLOCKS_HIGH
 FRAME_RATE = 20
-
-CHAR_KINDS = ["warrior", "mage"]
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -36,7 +24,7 @@ DARKGREEN = (0, 102, 0)
 DARKORANGE = (255, 128, 0)
 LIGHT_PURPLE = (255, 153, 255)
 ORANGE = (255, 128, 0)
-PURPLE = (128,  0, 128)
+PURPLE = (128, 0, 128)
 
 UP = 90
 DOWN = -90
@@ -50,8 +38,16 @@ PLAYER_IMG_DEAD = 'player_dead.png'
 MONSTER_IMG = 'giant_bat.png'
 MONSTER_IMG_DEAD = 'giant_bat_dead.png'
 
-MAPFILE = 'map.txt'
-GAME_DATA_FILE = 'game.json'
+MAP_FILE = 'map.txt'
+MAP_LEGEND_FILE = 'map_legend.json'
+OBSTACLE = 'obstacle'
+WALKABLE = 'walkable'
 
-TITLE = 'Broken Skull'
-FOOD_ENERGY = 10
+SRC_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(SRC_DIR)
+DATA_DIR = os.path.join(ROOT_DIR, 'data')
+
+GAME_DATA_FILE = 'game.json'
+ORIGINAL_GAME_FILE = os.path.join(DATA_DIR, 'original', GAME_DATA_FILE)
+CURRENT_GAME_FILE = os.path.join(DATA_DIR, 'current', GAME_DATA_FILE)
+MONSTER_DEFINITION_FILE = os.path.join(DATA_DIR, 'creatures', 'monsters.json')

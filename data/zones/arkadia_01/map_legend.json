@@ -1,0 +1,19 @@
+{
+  "*": {
+    "tile": "obstacle"
+  },
+  ".": {
+    "tile": "walkable"
+  },
+  "P": {
+    "tile": "walkable",
+    "player": true
+  },
+  "M": {
+    "tile": "walkable",
+    "monster": {
+      "name": "Nether",
+      "kind": "bat"
+    }
+  }
+}

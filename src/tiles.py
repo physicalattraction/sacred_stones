@@ -6,7 +6,7 @@ from typing import List, Dict
 import pygame
 
 import constants
-from utils import Direction, convert_direction_to_dx_dy, DATA_DIR
+from utils import Direction, convert_direction_to_dx_dy
 
 
 class Tile(pygame.sprite.Sprite, ABC):
@@ -17,7 +17,7 @@ class Tile(pygame.sprite.Sprite, ABC):
     image: pygame.Surface  # Image on the map
     rect: pygame.Rect  # Rectangle on the map
 
-    def __init__(self, x: int, y: int):
+    def __init__(self, *, x: int, y: int):
         assert self.IMAGE, f'Tile {self.__class__.__name__} has no map image defined'
         super().__init__()
         self.x = x
@@ -35,7 +35,7 @@ class Tile(pygame.sprite.Sprite, ABC):
         self.rect = self.rect.move(x * tilesize, y * tilesize)
 
     def _load_image(self, image_name: str) -> pygame.Surface:
-        filepath = os.path.join(DATA_DIR, 'images', image_name)
+        filepath = os.path.join(constants.DATA_DIR, 'images', image_name)
         try:
             return pygame.image.load(filepath).convert_alpha()
         except Exception as e:
@@ -62,17 +62,17 @@ class Creature(Tile, ABC):
     max_hit_points: int
     hit_points: int
 
-    def __init__(self, name: str, kind: str, armor: int, max_damage: int,
-                 chance_to_hit: int, max_hit_points: int, hit_points: int,
-                 *args, **kwargs):
+    def __init__(self, *, name: str, kind: str, armor: int, max_damage: int,
+                 chance_to_hit: int, max_hit_points: int, hit_points: int = None,
+                 **kwargs):
         self.name = name
         self.kind = kind
         self.armor = armor
         self.max_damage = max_damage
         self.chance_to_hit = chance_to_hit
         self.max_hit_points = max_hit_points
-        self.hit_points = hit_points
-        super().__init__(*args, **kwargs)
+        self.hit_points = hit_points if hit_points is not None else max_hit_points
+        super().__init__(**kwargs)
 
     def calculate_damage(self, enemy: 'Creature') -> int:
         # TODO: More sophisticated way to calculate damage

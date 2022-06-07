@@ -5,10 +5,6 @@ import constants
 
 Direction = int
 
-SRC_DIR = os.path.dirname(__file__)
-ROOT_DIR = os.path.dirname(SRC_DIR)
-DATA_DIR = os.path.join(ROOT_DIR, 'data')
-
 
 def convert_direction_to_dx_dy(direction: Direction) -> Tuple[int, int]:
     if direction == constants.LEFT:

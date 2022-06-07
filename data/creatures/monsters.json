@@ -1,0 +1,9 @@
+{
+  "bat": {
+    "kind": "bat",
+    "armor": 0,
+    "max_damage": 3,
+    "chance_to_hit": 80,
+    "max_hit_points": 10
+  }
+}
