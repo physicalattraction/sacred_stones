@@ -53,7 +53,6 @@ class Walkable(Tile):
 
 class Creature(Tile, ABC):
     IMAGE_DEAD: str
-    DATA_FILE: str
 
     name: str
     kind: str
@@ -93,17 +92,6 @@ class Creature(Tile, ABC):
     def from_json(cls, data: Dict) -> 'Creature':
         return cls(**data)
 
-    def save(self):
-        filepath = os.path.join(DATA_DIR, self.DATA_FILE)
-        with open(filepath, 'w') as f:
-            json.dump(self.as_json(), f, indent=2)
-
-    @classmethod
-    def load(cls) -> 'Creature':
-        filepath = os.path.join(DATA_DIR, cls.DATA_FILE)
-        with open(filepath, 'r') as f:
-            return cls.from_json(json.load(f))
-
     @property
     def image_name(self) -> str:
         if self.is_dead():
@@ -128,7 +116,6 @@ class OrientedTile(Tile, ABC):
 class Player(OrientedTile, Creature):
     IMAGE = constants.PLAYER_IMG
     IMAGE_DEAD = constants.PLAYER_IMG_DEAD
-    DATA_FILE = constants.PLAYER_DATA_FILE  # TODO: Remove this dependency
 
     def move(self, direction: Direction, obstacles: List[Obstacle]):
         # First rotate the image, then move the iamge
@@ -146,4 +133,3 @@ class Player(OrientedTile, Creature):
 class Monster(Creature):
     IMAGE = constants.MONSTER_IMG
     IMAGE_DEAD = constants.MONSTER_IMG_DEAD
-    DATA_FILE = constants.MONSTER_DATA_FILE

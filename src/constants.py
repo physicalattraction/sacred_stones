@@ -52,8 +52,6 @@ MONSTER_IMG_DEAD = 'giant_bat_dead.png'
 
 MAPFILE = 'map.txt'
 GAME_DATA_FILE = 'game.json'
-PLAYER_DATA_FILE = 'player.json'
-MONSTER_DATA_FILE = 'monster.json'
 
 TITLE = 'Broken Skull'
 FOOD_ENERGY = 10
