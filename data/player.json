@@ -1,0 +1,11 @@
+{
+  "name": "Melissa",
+  "kind": "human",
+  "x": 4,
+  "y": 1,
+  "armor": 2,
+  "max_damage": 4,
+  "chance_to_hit": 90,
+  "max_hit_points": 12,
+  "hit_points": 12
+}
