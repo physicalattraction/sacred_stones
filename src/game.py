@@ -12,22 +12,12 @@ from constants import DATA_DIR
 from dialogs import TextDialog, DialogFight
 from map import read_map
 from monster import Monster
-from tiles import Player, Obstacle, Walkable
+from player import Player, PlayerDict
+from tiles import Obstacle, Walkable
 from zone import Zone
 
 
 # Game state dicts
-
-class PlayerDict(TypedDict):
-    name: str
-    kind: str
-    x: int
-    y: int
-    armor: int
-    max_damage: int
-    chance_to_hit: int
-    max_hit_points: int
-    hit_points: int
 
 
 class GameDataDict(TypedDict):
@@ -38,26 +28,27 @@ class GameDataDict(TypedDict):
 class Game:
     _keep_looping: bool
     _active_zone: str
+    _zone: Zone
     _obstacles: List[Obstacle]
     _walkables: List[Walkable]
     _player: Player
     _all_sprites: Optional[pygame.sprite.Group]
 
     def __init__(self):
-        # Lazy loading backing variables
         self._init_pygame()
-
-        self.display_surface = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-        self.display_surface.fill(constants.UGLY_PINK)
+        self._display_surface = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
+        self._display_surface.fill(constants.UGLY_PINK)
 
         self.restart_game()
 
     def _init_pygame(self):
         pygame.init()
-        self.clock = pygame.time.Clock()
+        self._clock = pygame.time.Clock()
         pygame.display.set_caption(constants.TITLE)
-        self.screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-        self.font = pygame.font.Font(None, 40)
+        pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
+        pygame.font.Font(None, 40)
+        # self._screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
+        # self._font = pygame.font.Font(None, 40)
 
     @property
     def all_sprites(self) -> pygame.sprite.Group:
@@ -100,7 +91,7 @@ class Game:
         self._zone = Zone.load(self._active_zone)
 
     def _save_game_data(self):
-        # TODO: Implement a as_json method
+        # TODO: Implement an as_json method
         # TODO: Make a helper class (ABC) for this loading and saving
         game_data = {'active_zone': self._active_zone,
                      'player': self._player.as_json()}
@@ -148,7 +139,7 @@ class Game:
 
     def draw_stuff(self):
         self.all_sprites.update()
-        self.all_sprites.draw(self.display_surface)
+        self.all_sprites.draw(self._display_surface)
 
     def quit(self):
         pygame.quit()

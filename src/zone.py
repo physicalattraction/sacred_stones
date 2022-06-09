@@ -5,6 +5,7 @@ from typing import List, TypedDict
 from constants import DATA_DIR
 from map import read_map
 from monster import MonsterDict, Monster, monster_definitions
+from saveable import Saveable
 
 
 class ZoneDict(TypedDict):
@@ -16,7 +17,7 @@ class ZoneDict(TypedDict):
     monsters: List[MonsterDict]
 
 
-class Zone:
+class Zone(Saveable):
     identifier: str
     monsters: List[Monster]
 

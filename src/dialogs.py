@@ -5,7 +5,7 @@ import pygame
 import constants
 import utils
 from monster import Monster
-from tiles import Player
+from player import Player
 
 
 class TextDialog:

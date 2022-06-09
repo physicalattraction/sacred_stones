@@ -1,15 +1,14 @@
 import os
 from abc import ABC
-from typing import List, Dict
 
 import pygame
 
 import constants
-from utils import Direction, convert_direction_to_dx_dy
+from utils import Direction
 
 
 class Tile(pygame.sprite.Sprite, ABC):
-    IMAGE: str = ''
+    IMAGE: str = ''  # Must be set by concrete implementations
 
     x: int  # X-position on the map
     y: int  # Y-position on the map
@@ -50,55 +49,6 @@ class Walkable(Tile):
     IMAGE = constants.GRASS_IMG
 
 
-class Creature(Tile, ABC):
-    IMAGE_DEAD: str
-
-    name: str
-    kind: str
-    armor: int
-    max_damage: int
-    chance_to_hit: int
-    max_hit_points: int
-    hit_points: int
-
-    def __init__(self, *, name: str, kind: str, armor: int, max_damage: int,
-                 chance_to_hit: int, max_hit_points: int, hit_points: int = None,
-                 **kwargs):
-        self.name = name
-        self.kind = kind
-        self.armor = armor
-        self.max_damage = max_damage
-        self.chance_to_hit = chance_to_hit
-        self.max_hit_points = max_hit_points
-        self.hit_points = hit_points if hit_points is not None else max_hit_points
-        super().__init__(**kwargs)
-
-    def calculate_damage(self, enemy: 'Creature') -> int:
-        # TODO: More sophisticated way to calculate damage
-        return self.max_damage - enemy.armor
-
-    def is_dead(self):
-        return self.hit_points <= 0
-
-    def as_json(self) -> Dict:
-        return {
-            field: getattr(self, field)
-            for field in ('name', 'kind', 'x', 'y', 'armor', 'max_damage', 'chance_to_hit',
-                          'max_hit_points', 'hit_points')
-        }
-
-    @classmethod
-    def from_json(cls, data: Dict) -> 'Creature':
-        return cls(**data)
-
-    @property
-    def image_name(self) -> str:
-        if self.is_dead():
-            return self.IMAGE_DEAD or self.IMAGE
-        else:
-            return self.IMAGE
-
-
 class OrientedTile(Tile, ABC):
     direction: Direction
 
@@ -110,26 +60,3 @@ class OrientedTile(Tile, ABC):
         angle_to_turn = direction - self.direction
         self.image = pygame.transform.rotate(self.image, angle_to_turn)
         self.direction = direction
-
-
-class Player(OrientedTile, Creature):
-    IMAGE = constants.PLAYER_IMG
-    IMAGE_DEAD = constants.PLAYER_IMG_DEAD
-
-    def move(self, direction: Direction, obstacles: List[Obstacle]):
-        if self.is_dead():
-            print('You cannot move when you are dead')
-            return
-
-        # First rotate the image, then move the iamge
-        self.orient_towards(direction)
-        dx, dy = convert_direction_to_dx_dy(direction)
-        if not self._collide_with_obstacles(dx, dy, obstacles):
-            self.x += dx
-            self.y += dy
-            self.rect = self.rect.move(dx * constants.TILESIZE, dy * constants.TILESIZE)
-
-    def _collide_with_obstacles(self, dx: int, dy: int, obstacles: List[Obstacle]) -> bool:
-        return any(obstacle.x == self.x + dx and obstacle.y == self.y + dy for obstacle in obstacles)
-
-

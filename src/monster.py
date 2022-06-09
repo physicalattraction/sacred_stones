@@ -2,7 +2,7 @@ import json
 from typing import TypedDict
 
 import constants
-from tiles import Creature
+from creature import Creature, CreatureDict
 
 
 class MonsterDefinition(TypedDict):
@@ -19,15 +19,12 @@ class MonsterDefinition(TypedDict):
     max_hit_points: int
 
 
-class MonsterDict(MonsterDefinition):
+class MonsterDict(CreatureDict):
     """
     JSON representation of a monster's state
     """
 
-    name: str
-    x: int
-    y: int
-    hit_points: int
+    pass
 
 
 class Monster(Creature):

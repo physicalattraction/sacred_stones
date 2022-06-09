@@ -19,15 +19,15 @@ def convert_direction_to_dx_dy(direction: Direction) -> Tuple[int, int]:
 def separate_text_into_lines(mytext, line_length):
     mylist = []
     while len(mytext) >= line_length:
-        int = mytext[0:line_length].rfind(' ')
-        mylist.append(mytext[0:int].strip())
-        mytext = mytext[int:].strip()
+        myint = mytext[0:line_length].rfind(' ')
+        mylist.append(mytext[0:myint].strip())
+        mytext = mytext[myint:].strip()
     mylist.append(mytext)
     return mylist
 
 
 def _top_height(text_list, font):
-    if not type(text_list) == type([]):
+    if not isinstance(text_list, list):
         raise ValueError('Error')
     tallest = -1
     for elem in text_list:
@@ -43,9 +43,9 @@ def _top_height(text_list, font):
 def talk_dialog(screen, text, font, width_offset, height_offset, line_length=32, color=(0, 0, 0)):
     # text_list = separate_text_into_lines(text, line_length)
     text_list = []
-    if type(text) == type('bla'):
+    if isinstance(text, str):
         text_list = separate_text_into_lines(text, line_length)
-    elif type(text) == type([]):
+    elif isinstance(text, list):
         for line in text:
             temp = separate_text_into_lines(line, line_length)
             text_list += temp
