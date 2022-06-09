@@ -8,6 +8,8 @@ from monster import Monster
 from player import Player
 
 
+# TODO: Clean up this entire file
+
 class TextDialog:
     def __init__(self, text, line_width=50):
         self.BG_COLOR = constants.LIGHTGREY

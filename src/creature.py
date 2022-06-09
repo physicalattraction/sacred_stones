@@ -2,7 +2,7 @@ from abc import ABC
 from typing import TypedDict
 
 from saveable import Saveable
-from tiles import Tile
+from tile import Tile
 
 
 class CreatureDict(TypedDict):

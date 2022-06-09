@@ -1,3 +1,7 @@
+"""
+Abstract base classes for anything that can be drawn as a tile on the map
+"""
+
 import os
 from abc import ABC
 
@@ -39,14 +43,6 @@ class Tile(pygame.sprite.Sprite, ABC):
         except Exception as e:
             s = f'Couldn\'t open {filepath}: {e}'
             raise ValueError(s) from e
-
-
-class Obstacle(Tile):
-    IMAGE = constants.WALL_IMG
-
-
-class Walkable(Tile):
-    IMAGE = constants.GRASS_IMG
 
 
 class OrientedTile(Tile, ABC):

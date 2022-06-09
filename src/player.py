@@ -2,7 +2,8 @@ from typing import List, TypedDict
 
 import constants
 from creature import Creature, CreatureDict
-from tiles import OrientedTile, Obstacle
+from environment import Obstacle
+from tile import OrientedTile
 from utils import Direction, convert_direction_to_dx_dy
 
 
@@ -19,6 +20,7 @@ class Player(OrientedTile, Creature):
     IMAGE_DEAD = constants.PLAYER_IMG_DEAD
 
     def move(self, direction: Direction, obstacles: List[Obstacle]):
+        # TODO: Make a Map class, with a public method like 'tile_is_walkable()'
         if self.is_dead():
             print('You cannot move when you are dead')
             return

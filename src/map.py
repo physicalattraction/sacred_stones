@@ -2,7 +2,7 @@ import json
 import os.path
 from typing import List, Dict, TypedDict, Tuple
 
-import constants
+from constants import DATA_DIR
 
 
 class MonsterAssignment(TypedDict):
@@ -27,10 +27,11 @@ def read_map(zone_identifier: str) -> Tuple[WorldMap, MapLegend]:
 
     # TODO: Prevent reading the files twice
 
-    map_legend_file = os.path.join(constants.DATA_DIR, 'zones', zone_identifier, constants.MAP_LEGEND_FILE)
+    print(f'Reading map {zone_identifier}')
+    map_legend_file = os.path.join(DATA_DIR, 'original', 'zones', zone_identifier, 'map_legend.json')
     with open(map_legend_file, 'r') as f:
         map_legend = json.load(f)
-    map_file = os.path.join(constants.DATA_DIR, 'zones', zone_identifier, constants.MAP_FILE)
+    map_file = os.path.join(DATA_DIR, 'original', 'zones', zone_identifier, 'map.txt')
     with open(map_file, 'r') as f:
         world_map = [i.strip() for i in f.readlines()]
     return world_map, map_legend

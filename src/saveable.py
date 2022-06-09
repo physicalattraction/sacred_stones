@@ -3,13 +3,6 @@ from typing import Dict
 
 
 class Saveable(ABC):
-    def as_json(self) -> Dict:
-        """
-        Return the object's state information
-        """
-
-        raise NotImplementedError()
-
     @classmethod
     def from_json(cls, data: Dict) -> 'Saveable':
         """
@@ -21,3 +14,25 @@ class Saveable(ABC):
 
         # noinspection PyArgumentList
         return cls(**data)
+
+    def as_json(self) -> Dict:
+        """
+        Return the object's state information
+        """
+
+        raise NotImplementedError()
+
+    @classmethod
+    def load(cls, *args, **kwargs):
+        """
+        Load the object from it's state information
+        """
+
+        raise NotImplementedError()
+
+    def save(self):
+        """
+        Save the object's state information
+        """
+
+        raise NotImplementedError()

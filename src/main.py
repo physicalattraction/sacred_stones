@@ -7,7 +7,7 @@ from game import Game
 
 
 def run():
-    game = Game()
+    game = Game.load()
 
     while True:
         game.handle_events()

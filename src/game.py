@@ -3,7 +3,7 @@ import os.path
 import shutil
 import sys
 from shutil import copyfile
-from typing import Optional, List, TypedDict
+from typing import Optional, List, TypedDict, Dict
 
 import pygame
 
@@ -13,91 +13,70 @@ from dialogs import TextDialog, DialogFight
 from map import read_map
 from monster import Monster
 from player import Player, PlayerDict
-from tiles import Obstacle, Walkable
+from saveable import Saveable
+from environment import Obstacle, Walkable
 from zone import Zone
 
 
-# Game state dicts
-
-
-class GameDataDict(TypedDict):
+class GameDict(TypedDict):
     active_zone: str
     player: PlayerDict
 
 
-class Game:
+class Game(Saveable):
     _keep_looping: bool
     _active_zone: str
+    _player: Player
     _zone: Zone
     _obstacles: List[Obstacle]
     _walkables: List[Walkable]
-    _player: Player
     _all_sprites: Optional[pygame.sprite.Group]
 
     def __init__(self):
         self._init_pygame()
+        self._all_sprites = None
+        self._keep_looping = True
         self._display_surface = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
         self._display_surface.fill(constants.UGLY_PINK)
 
-        self.restart_game()
-
-    def _init_pygame(self):
-        pygame.init()
-        self._clock = pygame.time.Clock()
-        pygame.display.set_caption(constants.TITLE)
-        pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-        pygame.font.Font(None, 40)
-        # self._screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-        # self._font = pygame.font.Font(None, 40)
+        self._resume()
 
     @property
     def all_sprites(self) -> pygame.sprite.Group:
+        # TODO: Let zones define their own all sprites
         if not self._all_sprites:
             self._all_sprites = pygame.sprite.Group()
-            for elem in self._walkables:
+            for elem in self._zone.walkables:
                 self._all_sprites.add(elem)
-            for elem in self._obstacles:
+            for elem in self._zone.obstacles:
                 self._all_sprites.add(elem)
             for monster in self._zone.monsters:
                 self._all_sprites.add(monster)
             self._all_sprites.add(self._player)
         return self._all_sprites
 
-    def _load_environment_from_map(self):
-        self._obstacles = []
-        self._walkables = []
-        world_map, map_legend = read_map(self._active_zone)
-        for y, row in enumerate(world_map):
-            for x, cell_char in enumerate(row):
-                try:
-                    cell_info = map_legend[cell_char]
-                except KeyError as e:
-                    raise KeyError(f'Map character {cell_char} is not defined in map_legend') from e
-                tile = cell_info['tile']
-                if tile == constants.OBSTACLE:
-                    self._obstacles.append(Obstacle(x=x, y=y))
-                elif tile == constants.WALKABLE:
-                    self._walkables.append(Walkable(x=x, y=y))
-                else:
-                    raise ValueError(f'Tile {tile} is neither obstacle nor walkable')
+    # Saveable methods
 
-    def _load_game_data(self):
-        if not os.path.isfile(constants.CURRENT_GAME_FILE):
-            copyfile(constants.ORIGINAL_GAME_FILE, constants.CURRENT_GAME_FILE)
-        with open(constants.CURRENT_GAME_FILE, 'r') as f:
-            game_data = json.load(f)
-        self._active_zone = game_data['active_zone']
-        self._player = Player.from_json(game_data['player'])
-        self._zone = Zone.load(self._active_zone)
+    @classmethod
+    def from_json(cls, data: Dict) -> 'Game':
+        game = cls()
+        game._set_data(data)
+        return game
 
-    def _save_game_data(self):
-        # TODO: Implement an as_json method
-        # TODO: Make a helper class (ABC) for this loading and saving
-        game_data = {'active_zone': self._active_zone,
-                     'player': self._player.as_json()}
+    def as_json(self) -> GameDict:
+        return {'active_zone': self._active_zone, 'player': self._player.as_json()}
+
+    @classmethod
+    def load(cls):
+        data = cls._get_saved_data()
+        return cls.from_json(data)
+
+    def save(self):
         with open(constants.CURRENT_GAME_FILE, 'w') as f:
-            json.dump(game_data, f, indent=2)
+            json.dump(self.as_json(), f, indent=2)
         self._zone.save()
+
+    # Public methods
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -114,17 +93,17 @@ class Game:
                     os.remove(constants.CURRENT_GAME_FILE)
                     shutil.rmtree(os.path.join(DATA_DIR, 'current', 'zones'))
                     os.mkdir(os.path.join(DATA_DIR, 'current', 'zones'))
-                    self.restart_game()
+                    self._resume()
                 if event.key == pygame.K_LEFT:
-                    self._player.move(direction=constants.LEFT, obstacles=self._obstacles)
+                    self._player.move(direction=constants.LEFT, obstacles=self._zone.obstacles)
                 elif event.key == pygame.K_RIGHT:
-                    self._player.move(direction=constants.RIGHT, obstacles=self._obstacles)
+                    self._player.move(direction=constants.RIGHT, obstacles=self._zone.obstacles)
                 elif event.key == pygame.K_DOWN:
-                    self._player.move(direction=constants.DOWN, obstacles=self._obstacles)
+                    self._player.move(direction=constants.DOWN, obstacles=self._zone.obstacles)
                 elif event.key == pygame.K_UP:
-                    self._player.move(direction=constants.UP, obstacles=self._obstacles)
+                    self._player.move(direction=constants.UP, obstacles=self._zone.obstacles)
                 elif event.key == pygame.K_h:
-                    monster = self.monster_on_tile(self._player.x, self._player.y)
+                    monster = self._zone.monster_on_tile(self._player.x, self._player.y)
                     if not monster:
                         print('Player swings at the air')
                         return False
@@ -135,7 +114,35 @@ class Game:
                     self.dialog_have_a_fight(monster)
                     if self._player.is_dead():
                         self.player_died()
-                self._save_game_data()
+                self.save()
+
+    # Helper methods
+    def _init_pygame(self):
+        pygame.init()
+        self._clock = pygame.time.Clock()
+        pygame.display.set_caption(constants.TITLE)
+        pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
+        pygame.font.Font(None, 40)
+
+    @staticmethod
+    def _get_saved_data() -> GameDict:
+        """
+        Get the data saved in `current`, or from original if there is no current Game info
+        """
+
+        if not os.path.isfile(constants.CURRENT_GAME_FILE):
+            copyfile(constants.ORIGINAL_GAME_FILE, constants.CURRENT_GAME_FILE)
+        with open(constants.CURRENT_GAME_FILE, 'r') as f:
+            return json.load(f)
+
+    def _set_data(self, data: GameDict) -> None:
+        """
+        Set the given data in this Game instance
+        """
+
+        self._active_zone = data['active_zone']
+        self._player = Player.from_json(data['player'])
+        self._zone = Zone.load(data['active_zone'])
 
     def draw_stuff(self):
         self.all_sprites.update()
@@ -145,27 +152,18 @@ class Game:
         pygame.quit()
         sys.exit()
 
-    def monster_on_tile(self, x: int, y: int) -> Optional[Monster]:
-        """
-        Return the monster on the given tile, or None if there is no monster on the tile
-        """
-
-        # TODO: Delegate to Zone?
-
-        return next((monster for monster in self._zone.monsters if monster.x == x and monster.y == y), None)
-
     def dialog_have_a_fight(self, monster):
         fight_dialog = DialogFight(self._player, monster)
         fight_dialog.main()
-        self._save_game_data()
-        self.restart_game()
+        self.save()
+        self._resume()
 
-    def restart_game(self):
+    def _resume(self):
         self._init_pygame()
         self._all_sprites = None
         self._keep_looping = True
-        self._load_game_data()
-        self._load_environment_from_map()
+        data = self._get_saved_data()
+        self._set_data(data)
 
     def player_died(self):
         s = 'You are dead! Game over.'

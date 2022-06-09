@@ -1,8 +1,11 @@
 import json
+import os.path
 from typing import TypedDict
 
 import constants
 from creature import Creature, CreatureDict
+
+MONSTER_DEFINITION_FILE = os.path.join(constants.DATA_DIR, 'creatures', 'monsters.json')
 
 
 class MonsterDefinition(TypedDict):
@@ -32,6 +35,6 @@ class Monster(Creature):
     IMAGE_DEAD = constants.MONSTER_IMG_DEAD
 
 
-with open(constants.MONSTER_DEFINITION_FILE, 'r') as f:
+with open(MONSTER_DEFINITION_FILE, 'r') as f:
     print('Reading monster definition file')
     monster_definitions = json.load(f)

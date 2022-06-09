@@ -31,15 +31,11 @@ DOWN = -90
 RIGHT = 0
 LEFT = 180
 
-GRASS_IMG = 'grass.gif'
-WALL_IMG = 'trees.png'
 PLAYER_IMG = 'player.png'
 PLAYER_IMG_DEAD = 'player_dead.png'
 MONSTER_IMG = 'giant_bat.png'
 MONSTER_IMG_DEAD = 'giant_bat_dead.png'
 
-MAP_FILE = 'map.txt'
-MAP_LEGEND_FILE = 'map_legend.json'
 OBSTACLE = 'obstacle'
 WALKABLE = 'walkable'
 
@@ -50,4 +46,4 @@ DATA_DIR = os.path.join(ROOT_DIR, 'data')
 GAME_DATA_FILE = 'game.json'
 ORIGINAL_GAME_FILE = os.path.join(DATA_DIR, 'original', GAME_DATA_FILE)
 CURRENT_GAME_FILE = os.path.join(DATA_DIR, 'current', GAME_DATA_FILE)
-MONSTER_DEFINITION_FILE = os.path.join(DATA_DIR, 'creatures', 'monsters.json')
+
