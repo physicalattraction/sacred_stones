@@ -1,4 +1,3 @@
-import json
 import os
 from abc import ABC
 from typing import List, Dict
@@ -118,6 +117,10 @@ class Player(OrientedTile, Creature):
     IMAGE_DEAD = constants.PLAYER_IMG_DEAD
 
     def move(self, direction: Direction, obstacles: List[Obstacle]):
+        if self.is_dead():
+            print('You cannot move when you are dead')
+            return
+
         # First rotate the image, then move the iamge
         self.orient_towards(direction)
         dx, dy = convert_direction_to_dx_dy(direction)
@@ -130,6 +133,3 @@ class Player(OrientedTile, Creature):
         return any(obstacle.x == self.x + dx and obstacle.y == self.y + dy for obstacle in obstacles)
 
 
-class Monster(Creature):
-    IMAGE = constants.MONSTER_IMG
-    IMAGE_DEAD = constants.MONSTER_IMG_DEAD

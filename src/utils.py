@@ -1,4 +1,3 @@
-import os.path
 from typing import Tuple
 
 import constants

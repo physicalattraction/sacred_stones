@@ -1,5 +1,5 @@
 {
-  "zone": "arkadia_01",
+  "active_zone": "arkadia_01",
   "player": {
     "name": "Melissa",
     "kind": "human",
@@ -11,17 +11,5 @@
     "max_hit_points": 12,
     "hit_points": 12
   },
-  "monsters": [
-    {
-      "name": "Nether",
-      "kind": "bat",
-      "x": 4,
-      "y": 1,
-      "armor": 0,
-      "max_damage": 3,
-      "chance_to_hit": 80,
-      "max_hit_points": 10,
-      "hit_points": 10
-    }
-  ]
+  "zones": {}
 }
