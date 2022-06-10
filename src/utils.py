@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 
 import constants
 
@@ -6,6 +6,10 @@ Direction = int
 
 
 def convert_direction_to_dx_dy(direction: Direction) -> Tuple[int, int]:
+    """
+    Convert the direction into a tuple of movement in x and y direction
+    """
+
     if direction == constants.LEFT:
         return -1, 0
     if direction == constants.RIGHT:
@@ -16,14 +20,30 @@ def convert_direction_to_dx_dy(direction: Direction) -> Tuple[int, int]:
         return 0, -1
 
 
-def separate_text_into_lines(mytext, line_length):
-    mylist = []
-    while len(mytext) >= line_length:
-        myint = mytext[0:line_length].rfind(' ')
-        mylist.append(mytext[0:myint].strip())
-        mytext = mytext[myint:].strip()
-    mylist.append(mytext)
-    return mylist
+def separate_text_into_lines(txt: str, line_width: int) -> List[str]:
+    """
+    Separate a text into a list of text with maximum length of line_width
+
+    >>> separate_text_into_lines('Hello world', 2)
+    ['He', 'll', 'o', 'wo', 'rl', 'd']
+    >>> separate_text_into_lines('Hello world', 5)
+    ['Hello', 'world']
+    >>> separate_text_into_lines('Hello world', 8)
+    ['Hello', 'world']
+    >>> separate_text_into_lines('Hello world', 12)
+    ['Hello world']
+    """
+
+    result = []
+    while len(txt) >= line_width:
+        index_of_last_space = txt[0:line_width].rfind(' ')
+        if index_of_last_space == -1:
+            index_of_last_space = line_width
+        result.append(txt[0:index_of_last_space].strip())
+        txt = txt[index_of_last_space:].strip()
+    if txt:
+        result.append(txt)
+    return result
 
 
 def _top_height(text_list, font):
@@ -41,7 +61,7 @@ def _top_height(text_list, font):
 
 
 def talk_dialog(screen, text, font, width_offset, height_offset, line_length=32, color=(0, 0, 0)):
-    # text_list = separate_text_into_lines(text, line_length)
+    # _text_list = separate_text_into_lines(text, line_width)
     text_list = []
     if isinstance(text, str):
         text_list = separate_text_into_lines(text, line_length)

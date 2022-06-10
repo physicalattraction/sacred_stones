@@ -9,7 +9,8 @@ import pygame
 
 import constants
 from constants import DATA_DIR
-from dialogs import TextDialog, DialogFight
+from fight import DialogFight
+from text_dialog import TextDialog
 from player import Player, PlayerDict
 from saveable import Saveable
 from environment import Obstacle, Walkable
@@ -167,9 +168,7 @@ class Game(Saveable):
         self._set_data(data)
 
     def player_died(self):
-        s = 'You are dead! Game over.'
-        mydialog = TextDialog(s)
-        mydialog.main()
+        TextDialog.show('You are dead! Game over.')
         self._keep_looping = False
         self._init_pygame()
         # TODO: Restart game from latest savegame when player dies
