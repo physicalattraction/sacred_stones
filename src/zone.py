@@ -94,10 +94,9 @@ class Zone(Saveable):
 
     def monster_on_tile(self, x: int, y: int) -> Optional[Monster]:
         """
-        Return the monster on the given tile, or None if there is no monster on the tile
+        Return the _monster on the given tile, or None if there is no _monster on the tile
         """
 
-        # TODO: return self.map.monster_on_tile
         return next((monster for monster in self.monsters if monster.x == x and monster.y == y), None)
 
     # Helper methods
@@ -123,23 +122,3 @@ class Zone(Saveable):
                     monster_definition = monster_definitions[kind]
                     monsters.append(Monster(name=monster_info['name'], x=x, y=y, **monster_definition))
         return cls(identifier=identifier, monsters=monsters)
-
-    @staticmethod
-    def _load_map(identifier: str) -> Tuple[List[Obstacle], List[Walkable]]:
-        obstacles = []
-        walkables = []
-        world_map, map_legend = read_map(identifier)
-        for y, row in enumerate(world_map):
-            for x, cell_char in enumerate(row):
-                try:
-                    cell_info = map_legend[cell_char]
-                except KeyError as e:
-                    raise KeyError(f'Map character {cell_char} is not defined in map_legend') from e
-                tile = cell_info['tile']
-                if tile == constants.OBSTACLE:
-                    obstacles.append(Obstacle(x=x, y=y))
-                elif tile == constants.WALKABLE:
-                    walkables.append(Walkable(x=x, y=y))
-                else:
-                    raise ValueError(f'Tile {tile} is neither obstacle nor walkable')
-        return obstacles, walkables

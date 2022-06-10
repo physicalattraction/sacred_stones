@@ -10,7 +10,7 @@ from zonemap import ZoneMap
 
 class PlayerDict(CreatureDict):
     """
-    JSON representation of a player's state
+    JSON representation of a _player's state
     """
 
     pass

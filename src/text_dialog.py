@@ -2,11 +2,12 @@ import pygame
 
 import constants
 import utils
+from utils import get_text_list
 
 
 class TextDialog:
     """
-    Class that displays a text message to the screen, with only an OK button
+    Class that displays a text message to the _screen, with only an OK button
     """
 
     BG_COLOR = constants.LIGHT_GREY
@@ -20,13 +21,13 @@ class TextDialog:
         pygame.init()
         self._font = pygame.font.Font(None, 35)
 
-        self._set_text_list(text, line_width)
+        self._text_list = get_text_list(text, line_width)
 
-        # Make the screen 50 characters wide, regardless of the text, plus 40 pixels margin
+        # Make the _screen 50 characters wide, regardless of the text, plus 40 pixels margin
         text_width, _ = self._font.size('a')
         self._screen_width = line_width * text_width + 40
 
-        # Make the screen 80 pixels + the _screen_height needed for the text
+        # Make the _screen 80 pixels + the _screen_height needed for the text
         self._line_height = -1
         self._screen_height = 80
         for elem in self._text_list:
@@ -55,12 +56,12 @@ class TextDialog:
     def _set_text_list(self, text, line_width):
         self._text_list = []
         if isinstance(text, str):
-            self._text_list = utils.separate_text_into_lines(text, line_width)
+            self._text_list = utils._separate_text_into_lines(text, line_width)
         elif isinstance(text, list):
             # Keep the original line breaks, but break long lines up.
             self._text_list = []
             for elem in text:
-                self._text_list += utils.separate_text_into_lines(elem, line_width)
+                self._text_list += utils._separate_text_into_lines(elem, line_width)
         else:
             s = f'Can only init {self.__class__.__name__} with str or text, given {type(text)}'
             raise ValueError(s)

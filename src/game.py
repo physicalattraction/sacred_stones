@@ -9,11 +9,12 @@ import pygame
 
 import constants
 from constants import DATA_DIR
-from fight import DialogFight
+from fight import Fight
 from text_dialog import TextDialog
 from player import Player, PlayerDict
 from saveable import Saveable
 from environment import Obstacle, Walkable
+from utils import init_pygame
 from zone import Zone
 
 
@@ -32,10 +33,10 @@ class Game(Saveable):
     _all_sprites: Optional[pygame.sprite.Group]
 
     def __init__(self):
-        self._init_pygame()
+        init_pygame()
         self._all_sprites = None
         self._keep_looping = True
-        self._display_surface = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
+        self._display_surface = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
         self._display_surface.fill(constants.UGLY_PINK)
 
         self._resume()
@@ -51,8 +52,8 @@ class Game(Saveable):
             #     self._all_sprites.add(elem)
             # for elem in self._zone.obstacles:
             #     self._all_sprites.add(elem)
-            # for monster in self._zone.monsters:
-            #     self._all_sprites.add(monster)
+            # for _monster in self._zone.monsters:
+            #     self._all_sprites.add(_monster)
             # self._all_sprites.add(self._player)
         return self._all_sprites
 
@@ -118,14 +119,6 @@ class Game(Saveable):
                         self.player_died()
                 self.save()
 
-    # Helper methods
-    def _init_pygame(self):
-        pygame.init()
-        self._clock = pygame.time.Clock()
-        pygame.display.set_caption(constants.TITLE)
-        pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-        pygame.font.Font(None, 40)
-
     @staticmethod
     def _get_saved_data() -> GameDict:
         """
@@ -155,13 +148,13 @@ class Game(Saveable):
         sys.exit()
 
     def dialog_have_a_fight(self, monster):
-        fight_dialog = DialogFight(self._player, monster)
+        fight_dialog = Fight(self._player, monster)
         fight_dialog.main()
         self.save()
         self._resume()
 
     def _resume(self):
-        self._init_pygame()
+        init_pygame()
         self._all_sprites = None
         self._keep_looping = True
         data = self._get_saved_data()
@@ -170,5 +163,5 @@ class Game(Saveable):
     def player_died(self):
         TextDialog.show('You are dead! Game over.')
         self._keep_looping = False
-        self._init_pygame()
-        # TODO: Restart game from latest savegame when player dies
+        init_pygame()
+        # TODO: Restart game from latest savegame when _player dies

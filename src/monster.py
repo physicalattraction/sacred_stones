@@ -10,10 +10,10 @@ MONSTER_DEFINITION_FILE = os.path.join(constants.DATA_DIR, 'creatures', 'monster
 
 class MonsterDefinition(TypedDict):
     """
-    JSON representation of a monster's properties at initialization
+    JSON representation of a _monster's properties at initialization
     """
 
-    # TODO: Make a Python class per monster?
+    # TODO: Make a Python class per _monster?
 
     kind: str
     armor: int
@@ -24,7 +24,7 @@ class MonsterDefinition(TypedDict):
 
 class MonsterDict(CreatureDict):
     """
-    JSON representation of a monster's state
+    JSON representation of a _monster's state
     """
 
     pass

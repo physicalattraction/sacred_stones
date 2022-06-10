@@ -1,8 +1,19 @@
-from typing import Tuple, List
+from typing import Tuple, List, Union
+
+import pygame
 
 import constants
 
 Direction = int
+
+
+# Helper methods
+
+def init_pygame(title: str = constants.TITLE, width: int = constants.SCREEN_WIDTH,
+                height: int = constants.SCREEN_HEIGHT) -> pygame.Surface:
+    pygame.init()
+    pygame.display.set_caption(title)
+    return pygame.display.set_mode((width, height))
 
 
 def convert_direction_to_dx_dy(direction: Direction) -> Tuple[int, int]:
@@ -20,30 +31,50 @@ def convert_direction_to_dx_dy(direction: Direction) -> Tuple[int, int]:
         return 0, -1
 
 
-def separate_text_into_lines(txt: str, line_width: int) -> List[str]:
+def get_text_list(text: Union[str, List[str]], line_width: int) -> List[str]:
     """
-    Separate a text into a list of text with maximum length of line_width
+    Separate a text into a list of texts with maximum length of line_width
 
-    >>> separate_text_into_lines('Hello world', 2)
+    If the input is a list, the line breaks are kept, but still split if too long
+
+    >>> get_text_list('Hello world', 2)
     ['He', 'll', 'o', 'wo', 'rl', 'd']
-    >>> separate_text_into_lines('Hello world', 5)
+    >>> get_text_list('Hello world', 5)
     ['Hello', 'world']
-    >>> separate_text_into_lines('Hello world', 8)
+    >>> get_text_list('Hello world', 8)
     ['Hello', 'world']
-    >>> separate_text_into_lines('Hello world', 12)
+    >>> get_text_list('Hello world', 12)
     ['Hello world']
+    >>> get_text_list('Hello world', 3)
+    ['Hel', 'lo', 'wor', 'ld']
+    >>> get_text_list(['Hello', 'world'], 12)
+    ['Hello', 'world']
     """
 
-    result = []
-    while len(txt) >= line_width:
-        index_of_last_space = txt[0:line_width].rfind(' ')
-        if index_of_last_space == -1:
-            index_of_last_space = line_width
-        result.append(txt[0:index_of_last_space].strip())
-        txt = txt[index_of_last_space:].strip()
-    if txt:
-        result.append(txt)
+    def _separate_text_into_lines(_text: str) -> List[str]:
+        _result = []
+        while len(_text) >= line_width:
+            index_of_last_space = _text[0:line_width].rfind(' ')
+            if index_of_last_space == -1:
+                index_of_last_space = line_width
+            _result.append(_text[0:index_of_last_space].strip())
+            _text = _text[index_of_last_space:].strip()
+        if _text:
+            _result.append(_text)
+        return _result
+
+    if isinstance(text, str):
+        result = _separate_text_into_lines(text)
+    elif isinstance(text, list):
+        # Keep the original line breaks, but break long lines up.
+        result = []
+        for line in text:
+            result += _separate_text_into_lines(line)
+    else:
+        s = f'Expected a str or list of str, given {type(text)}'
+        raise ValueError(s)
     return result
+
 
 
 def _top_height(text_list, font):
@@ -60,18 +91,15 @@ def _top_height(text_list, font):
     return tallest
 
 
-def talk_dialog(screen, text, font, width_offset, height_offset, line_length=32, color=(0, 0, 0)):
-    # _text_list = separate_text_into_lines(text, line_width)
-    text_list = []
-    if isinstance(text, str):
-        text_list = separate_text_into_lines(text, line_length)
-    elif isinstance(text, list):
-        for line in text:
-            temp = separate_text_into_lines(line, line_length)
-            text_list += temp
-    else:
-        s = 'Doh! That type of data should not be here!'
-        raise ValueError(s)
+def talk_dialog(screen: pygame.Surface, text: Union[str, list], font: pygame.font.Font,
+                width_offset: int, height_offset: int, line_width: int = 32,
+                color: Tuple[int, int, int] = constants.BLACK):
+    """
+    Display the given text onto the given screen
+    """
+
+    text_list = get_text_list(text, line_width)
+
     # ----------------------
     text_height = _top_height(text_list, font) + 3
     for count, elem in enumerate(text_list):
