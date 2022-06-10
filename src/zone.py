@@ -2,12 +2,14 @@ import json
 import os.path
 from typing import List, TypedDict, Tuple, Optional
 
+import pygame
+
 import constants
 from constants import DATA_DIR
 from environment import Walkable, Obstacle
-from map import read_map
 from monster import MonsterDict, Monster, monster_definitions
 from saveable import Saveable
+from zonemap import ZoneMap
 
 
 class ZoneDict(TypedDict):
@@ -25,10 +27,14 @@ class Zone(Saveable):
     obstacles: List[Obstacle]
     monsters: List[Monster]
 
+    _all_sprites: Optional[pygame.sprite.Group]
+
     def __init__(self, identifier: str, monsters: List[Monster]):
-        self.obstacles, self.walkables = self._load_environment_from_map(identifier)
+        self.map = ZoneMap.load(identifier)
         self.identifier = identifier
         self.monsters = monsters
+
+        self._all_sprites = None
 
     # Saveable methods
 
@@ -80,13 +86,19 @@ class Zone(Saveable):
 
     # Methods for clients
 
+    @property
+    def all_sprites(self) -> pygame.sprite.Group():
+        if not self._all_sprites:
+            self._all_sprites = pygame.sprite.Group(*self.map.all_sprites, *self.monsters)
+        return self._all_sprites
+
     def monster_on_tile(self, x: int, y: int) -> Optional[Monster]:
         """
         Return the monster on the given tile, or None if there is no monster on the tile
         """
 
+        # TODO: return self.map.monster_on_tile
         return next((monster for monster in self.monsters if monster.x == x and monster.y == y), None)
-
 
     # Helper methods
 
@@ -99,7 +111,7 @@ class Zone(Saveable):
     @classmethod
     def _init_zone_from_map(cls, identifier: str) -> 'Zone':
         monsters = []
-        world_map, map_legend = read_map(identifier)
+        world_map, map_legend = ZoneMap.read_map(identifier)
         for y, row in enumerate(world_map):
             for x, cell_char in enumerate(row):
                 try:
@@ -113,7 +125,7 @@ class Zone(Saveable):
         return cls(identifier=identifier, monsters=monsters)
 
     @staticmethod
-    def _load_environment_from_map(identifier: str) -> Tuple[List[Obstacle], List[Walkable]]:
+    def _load_map(identifier: str) -> Tuple[List[Obstacle], List[Walkable]]:
         obstacles = []
         walkables = []
         world_map, map_legend = read_map(identifier)

@@ -10,8 +10,6 @@ import pygame
 import constants
 from constants import DATA_DIR
 from dialogs import TextDialog, DialogFight
-from map import read_map
-from monster import Monster
 from player import Player, PlayerDict
 from saveable import Saveable
 from environment import Obstacle, Walkable
@@ -45,14 +43,16 @@ class Game(Saveable):
     def all_sprites(self) -> pygame.sprite.Group:
         # TODO: Let zones define their own all sprites
         if not self._all_sprites:
-            self._all_sprites = pygame.sprite.Group()
-            for elem in self._zone.walkables:
-                self._all_sprites.add(elem)
-            for elem in self._zone.obstacles:
-                self._all_sprites.add(elem)
-            for monster in self._zone.monsters:
-                self._all_sprites.add(monster)
-            self._all_sprites.add(self._player)
+            self._all_sprites = pygame.sprite.Group(*self._zone.all_sprites, self._player)
+            # self._all_sprites = pygame.sprite.Group()
+            # self._all_sprites_2 = pygame.sprite.Group()
+            # for elem in self._zone.walkables:
+            #     self._all_sprites.add(elem)
+            # for elem in self._zone.obstacles:
+            #     self._all_sprites.add(elem)
+            # for monster in self._zone.monsters:
+            #     self._all_sprites.add(monster)
+            # self._all_sprites.add(self._player)
         return self._all_sprites
 
     # Saveable methods
@@ -95,13 +95,14 @@ class Game(Saveable):
                     os.mkdir(os.path.join(DATA_DIR, 'current', 'zones'))
                     self._resume()
                 if event.key == pygame.K_LEFT:
-                    self._player.move(direction=constants.LEFT, obstacles=self._zone.obstacles)
+                    # TODO: Continue from here: use Map.is_walkable
+                    self._player.move(direction=constants.LEFT, zone_map=self._zone.map)
                 elif event.key == pygame.K_RIGHT:
-                    self._player.move(direction=constants.RIGHT, obstacles=self._zone.obstacles)
+                    self._player.move(direction=constants.RIGHT, zone_map=self._zone.map)
                 elif event.key == pygame.K_DOWN:
-                    self._player.move(direction=constants.DOWN, obstacles=self._zone.obstacles)
+                    self._player.move(direction=constants.DOWN, zone_map=self._zone.map)
                 elif event.key == pygame.K_UP:
-                    self._player.move(direction=constants.UP, obstacles=self._zone.obstacles)
+                    self._player.move(direction=constants.UP, zone_map=self._zone.map)
                 elif event.key == pygame.K_h:
                     monster = self._zone.monster_on_tile(self._player.x, self._player.y)
                     if not monster:

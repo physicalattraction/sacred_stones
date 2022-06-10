@@ -50,7 +50,8 @@ class OrientedTile(Tile, ABC):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.direction = constants.DOWN
+        self.direction = constants.DOWN  # This is how the initial image is oriented
+        self.orient_towards(constants.RIGHT)  # This is how the player should be oriented
 
     def orient_towards(self, direction: Direction):
         angle_to_turn = direction - self.direction

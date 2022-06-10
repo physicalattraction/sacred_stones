@@ -36,9 +36,6 @@ PLAYER_IMG_DEAD = 'player_dead.png'
 MONSTER_IMG = 'giant_bat.png'
 MONSTER_IMG_DEAD = 'giant_bat_dead.png'
 
-OBSTACLE = 'obstacle'
-WALKABLE = 'walkable'
-
 SRC_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(SRC_DIR)
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
