@@ -6,7 +6,7 @@ import pygame
 
 from constants import DATA_DIR
 from environment import Walkable, Obstacle
-from monster import MonsterDict, Monster, monster_definitions
+from monster.monster import MonsterDict, Monster
 from saveable import Saveable
 from zonemap import ZoneMap
 
@@ -120,7 +120,5 @@ class Zone(Saveable):
                 except KeyError as e:
                     raise KeyError(f'Map character {cell_char} is not defined in map_legend') from e
                 if monster_info := cell_info.get('monster'):
-                    kind = monster_info['kind']
-                    monster_definition = monster_definitions[kind]
-                    monsters.append(Monster(name=monster_info['name'], x=x, y=y, **monster_definition))
+                    monsters.append(Monster.from_json(monster_info, x=x, y=y))
         return cls(identifier=identifier, monsters=monsters)

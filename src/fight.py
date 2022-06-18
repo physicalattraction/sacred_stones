@@ -6,7 +6,7 @@ import pygame
 
 import constants
 import utils
-from monster import Monster
+from monster.monster import Monster
 from player import Player
 
 
@@ -45,8 +45,7 @@ class Fight:
 
     def _get_random_background_image(self) -> str:
         bg_images = self._get_background_images()
-        rand_int = random.randint(0, len(bg_images) - 1)
-        return bg_images[rand_int]
+        return random.choice(bg_images)
 
     def _handle_events(self):
         for event in pygame.event.get():

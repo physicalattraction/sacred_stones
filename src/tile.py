@@ -20,7 +20,7 @@ class Tile(pygame.sprite.Sprite, ABC):
     image: pygame.Surface  # Image on the map
     rect: pygame.Rect  # Rectangle on the map
 
-    def __init__(self, *, x: int, y: int):
+    def __init__(self, *, x: int, y: int, **kwargs):
         assert self.IMAGE, f'Tile {self.__class__.__name__} has no map image defined'
         super().__init__()
         self.x = x
@@ -49,8 +49,8 @@ class Tile(pygame.sprite.Sprite, ABC):
 class OrientedTile(Tile, ABC):
     direction: Direction
 
-    def __init__(self, direction: int, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *, direction: int, **kwargs):
+        super().__init__(**kwargs)
         self.direction = constants.DOWN  # This is how the initial image is oriented
         self.orient_towards(direction)  # This is how the tile should be oriented
 

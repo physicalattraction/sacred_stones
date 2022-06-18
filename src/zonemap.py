@@ -16,14 +16,15 @@ SOUTH = 'south'
 WEST = 'west'
 
 
+# TODO: We have MonsterDict and MonsterAssignment, and (x,y) are not part of MonsterAssignment.
+#       I feel this could be improved.
 class MonsterAssignment(TypedDict):
     name: str
     kind: str
 
 
 class CellDefinition(TypedDict, total=False):
-    # TODO: Investigate why PyCharm is complaining about this type hinting
-    tile: Literal[OBSTACLE, WALKABLE]
+    tile: Literal['obstacle', 'walkable']
     player: bool
     monster: MonsterAssignment
 

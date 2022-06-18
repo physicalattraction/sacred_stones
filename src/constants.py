@@ -35,8 +35,6 @@ LEFT = 180
 
 PLAYER_IMG = 'player.png'
 PLAYER_IMG_DEAD = 'player_dead.png'
-MONSTER_IMG = 'giant_bat.png'
-MONSTER_IMG_DEAD = 'giant_bat_dead.png'
 
 SRC_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(SRC_DIR)

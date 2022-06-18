@@ -24,7 +24,7 @@ class CreatureDict(TypedDict):
 class Creature(Tile, Saveable, ABC):
     # TODO: Should Creature have its own load() and save() method? If not, why not?
 
-    IMAGE_DEAD: str
+    IMAGE_DEAD: str = None
 
     name: str
     kind: str
@@ -34,16 +34,10 @@ class Creature(Tile, Saveable, ABC):
     max_hit_points: int
     hit_points: int
 
-    def __init__(self, *, name: str, kind: str, armor: int, max_damage: int,
-                 chance_to_hit: int, max_hit_points: int, hit_points: int = None,
+    # TODO: Should these all be the initializer?
+    def __init__(self, *, hit_points: int = None,
                  **kwargs):
-        self.name = name
-        self.kind = kind
-        self.armor = armor
-        self.max_damage = max_damage
-        self.chance_to_hit = chance_to_hit
-        self.max_hit_points = max_hit_points
-        self.hit_points = hit_points if hit_points is not None else max_hit_points
+        self.hit_points = hit_points if hit_points is not None else self.max_hit_points
         super().__init__(**kwargs)
 
     def calculate_damage(self, enemy: 'Creature') -> int:
@@ -59,10 +53,3 @@ class Creature(Tile, Saveable, ABC):
             return self.IMAGE_DEAD or self.IMAGE  # Fallback to IMAGE if there is no IMAGE_DEAD
         else:
             return self.IMAGE
-
-    def as_json(self) -> CreatureDict:
-        # noinspection PyUnresolvedReferences
-        return {
-            field: getattr(self, field)
-            for field in CreatureDict.__required_keys__
-        }
