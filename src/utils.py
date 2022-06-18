@@ -77,7 +77,8 @@ def get_text_list(text: Union[str, List[str]], line_width: int) -> List[str]:
 
 
 def display_text(screen: pygame.Surface, text: Union[str, list], font: pygame.font.Font,
-                 width_offset: int, height_offset: int, line_width: int, color: Tuple[int, int, int]) -> int:
+                 width_offset: int, height_offset: int, line_width: int, color: Tuple[int, int, int],
+                 shadow_color: Tuple[int, int, int] = None) -> int:
     """
     Display the given text onto the given screen, and give the resulting height of the text
     """
@@ -86,9 +87,14 @@ def display_text(screen: pygame.Surface, text: Union[str, list], font: pygame.fo
     line_height = max(font.size(line)[1] for line in text_list) + 3
     total_height = 0
     for count, line in enumerate(text_list):
+        height = height_offset + (line_height * count)
+        if shadow_color:
+            shadow_surface = font.render(line, True, shadow_color)
+            shadow_left = width_offset + 1
+            shadow_top = height + 10 + 1
+            screen.blit(shadow_surface, (shadow_left, shadow_top))
         surface = font.render(line, True, color)
         left = width_offset
-        height = height_offset + (line_height * count)
         top = height + 10
         screen.blit(surface, (left, top))
         total_height += line_height

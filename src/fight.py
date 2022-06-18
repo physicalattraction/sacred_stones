@@ -1,4 +1,6 @@
+import os.path
 import random
+from typing import List
 
 import pygame
 
@@ -13,11 +15,15 @@ class Fight:
     Take the player and a monster and let them fight
     """
 
-    BG_COLOR = constants.WHITE
+    BACKROUND_IMAGE_DIR = os.path.join(constants.DATA_DIR, 'images', 'background', 'fight')
     FLEE_PENALTY = 20
 
     def __init__(self, player: Player, monster: Monster):
         self._screen = utils.init_pygame()
+
+        background_image_filepath = os.path.join(self.BACKROUND_IMAGE_DIR, self._get_random_background_image())
+
+        self._background_image = pygame.image.load(background_image_filepath)
         self._player = player
         self._monster = monster
         self._all_sprites = pygame.sprite.Group(self._player, self._monster)
@@ -29,6 +35,18 @@ class Fight:
         multiplier = 4  # Make the image 4 times bigger as on the zone map
         self._player.place_on_screen(constants.TILESIZE * multiplier, 0, 0)
         self._monster.place_on_screen(constants.TILESIZE * multiplier, constants.NR_BLOCKS_WIDE // multiplier - 1, 0)
+
+    def _get_background_images(self) -> List[str]:
+        """
+        Filenames of possible background images
+        """
+
+        return list(os.scandir(self.BACKROUND_IMAGE_DIR))
+
+    def _get_random_background_image(self) -> str:
+        bg_images = self._get_background_images()
+        rand_int = random.randint(0, len(bg_images) - 1)
+        return bg_images[rand_int]
 
     def _handle_events(self):
         for event in pygame.event.get():
@@ -65,23 +83,25 @@ class Fight:
             self._keep_looping = False
 
     def _draw(self):
-        self._screen.fill(self.BG_COLOR)
+        self._screen.blit(self._background_image, (0, 0))
 
         monster_list = [f'{str(self._monster).title()}:', f'Hit Points: {self._monster.hit_points}',
                         f'Armor: {self._monster.armor}', f'Max damage: {self._monster.max_damage}',
                         f'Chance to hit: {self._monster.chance_to_hit}']
         utils.display_text(self._screen, monster_list, self._font, width_offset=475,
-                           height_offset=250, line_width=60, color=constants.BLACK)
+                           height_offset=250, line_width=60, color=constants.YELLOW, shadow_color=constants.BLACK)
 
         player_list = [f'{self._player}:', f'Hit Points: {self._player.hit_points}', f'Armor: {self._player.armor}',
                        f'Max damage: {self._player.max_damage}', f'Chance to hit: {self._player.chance_to_hit}']
         player_height = utils.display_text(self._screen, player_list, self._font, width_offset=20,
-                                           height_offset=250, line_width=60, color=constants.BLACK)
+                                           height_offset=250, line_width=60,
+                                           color=constants.YELLOW, shadow_color=constants.BLACK)
 
         action_list = ['What would you like to do?', 'H = Hit',
                        f'X = Flee (Fleeing will cost {self.FLEE_PENALTY} hitpoints)']
         utils.display_text(self._screen, action_list, self._font, width_offset=20,
-                           height_offset=250 + player_height + 40, line_width=60, color=constants.BLACK)
+                           height_offset=250 + player_height + 40, line_width=60,
+                           color=constants.YELLOW, shadow_color=constants.BLACK)
 
         self._all_sprites.update()
         self._all_sprites.draw(self._screen)
