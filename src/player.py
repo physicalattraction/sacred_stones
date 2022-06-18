@@ -1,3 +1,5 @@
+import os.path
+
 import constants
 from creature import Creature, CreatureDict
 from tile import OrientedTile
@@ -14,6 +16,7 @@ class PlayerDict(CreatureDict):
 
 
 class Player(OrientedTile, Creature):
+    IMAGE_DIR: str = os.path.join(constants.DATA_DIR, 'images', 'player')
     IMAGE = constants.PLAYER_IMG
     IMAGE_DEAD = constants.PLAYER_IMG_DEAD
 

@@ -31,6 +31,7 @@ class MonsterDict(CreatureDict):
 
 
 class Monster(Creature):
+    IMAGE_DIR: str = os.path.join(constants.DATA_DIR, 'images', 'monster')
     IMAGE = constants.MONSTER_IMG
     IMAGE_DEAD = constants.MONSTER_IMG_DEAD
 

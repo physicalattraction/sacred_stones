@@ -12,6 +12,7 @@ from utils import Direction
 
 
 class Tile(pygame.sprite.Sprite, ABC):
+    IMAGE_DIR: str = os.path.join(constants.DATA_DIR, 'images', 'tile')  # Can be set by concrete implementations
     IMAGE: str = ''  # Must be set by concrete implementations
 
     x: int  # X-position on the map
@@ -37,7 +38,7 @@ class Tile(pygame.sprite.Sprite, ABC):
         self.rect = self.rect.move(x * tilesize, y * tilesize)
 
     def _load_image(self, image_name: str) -> pygame.Surface:
-        filepath = os.path.join(constants.DATA_DIR, 'images', image_name)
+        filepath = os.path.join(self.IMAGE_DIR, image_name)
         try:
             return pygame.image.load(filepath).convert_alpha()
         except Exception as e:

@@ -80,7 +80,7 @@ def display_text(screen: pygame.Surface, text: Union[str, list], font: pygame.fo
                  width_offset: int, height_offset: int, line_width: int, color: Tuple[int, int, int],
                  shadow_color: Tuple[int, int, int] = None) -> int:
     """
-    Display the given text onto the given screen, and give the resulting height of the text
+    Display the given text onto the given screen, and return the resulting height of the text
     """
 
     text_list = get_text_list(text, line_width)
