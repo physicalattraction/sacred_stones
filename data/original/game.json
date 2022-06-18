@@ -5,6 +5,7 @@
     "kind": "human",
     "x": 1,
     "y": 1,
+    "direction": 0,
     "armor": 2,
     "max_damage": 4,
     "chance_to_hit": 90,

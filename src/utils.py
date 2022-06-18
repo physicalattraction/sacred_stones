@@ -76,36 +76,20 @@ def get_text_list(text: Union[str, List[str]], line_width: int) -> List[str]:
     return result
 
 
-
-def _top_height(text_list, font):
-    if not isinstance(text_list, list):
-        raise ValueError('Error')
-    tallest = -1
-    for elem in text_list:
-        try:
-            _, text_height = font.size(elem)
-        except:
-            raise ValueError(elem)
-        if text_height > tallest:
-            tallest = text_height
-    return tallest
-
-
-def talk_dialog(screen: pygame.Surface, text: Union[str, list], font: pygame.font.Font,
-                width_offset: int, height_offset: int, line_width: int = 32,
-                color: Tuple[int, int, int] = constants.BLACK):
+def display_text(screen: pygame.Surface, text: Union[str, list], font: pygame.font.Font,
+                 width_offset: int, height_offset: int, line_width: int, color: Tuple[int, int, int]) -> int:
     """
-    Display the given text onto the given screen
+    Display the given text onto the given screen, and give the resulting height of the text
     """
 
     text_list = get_text_list(text, line_width)
-
-    # ----------------------
-    text_height = _top_height(text_list, font) + 3
-    for count, elem in enumerate(text_list):
-        surface = font.render(elem, True, color)
-        # ----------------------
+    line_height = max(font.size(line)[1] for line in text_list) + 3
+    total_height = 0
+    for count, line in enumerate(text_list):
+        surface = font.render(line, True, color)
         left = width_offset
-        height = height_offset + (text_height * count)
+        height = height_offset + (line_height * count)
         top = height + 10
         screen.blit(surface, (left, top))
+        total_height += line_height
+    return total_height

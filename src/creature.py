@@ -22,6 +22,8 @@ class CreatureDict(TypedDict):
 
 
 class Creature(Tile, Saveable, ABC):
+    # TODO: Should Creature have its own load() and save() method? If not, why not?
+
     IMAGE_DEAD: str
 
     name: str

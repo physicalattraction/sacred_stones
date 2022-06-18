@@ -1,0 +1,7 @@
+{
+  "neighbor_zones": {
+    "west": "arkadia_02",
+    "south": "arkadia_01",
+    "north": "arkadia_01"
+  }
+}

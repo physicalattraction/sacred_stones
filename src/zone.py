@@ -1,10 +1,9 @@
 import json
 import os.path
-from typing import List, TypedDict, Tuple, Optional
+from typing import List, TypedDict, Optional
 
 import pygame
 
-import constants
 from constants import DATA_DIR
 from environment import Walkable, Obstacle
 from monster import MonsterDict, Monster, monster_definitions
@@ -40,8 +39,11 @@ class Zone(Saveable):
 
     @classmethod
     def get_filepath(cls, identifier: str):
+        zones_dir = os.path.join(DATA_DIR, 'current', 'zones')
+        if not os.path.isdir(zones_dir):
+            os.mkdir(zones_dir)
         # TODO: Remove hardcoded `current` when implementing save slots
-        return os.path.join(DATA_DIR, 'current', 'zones', f'{identifier}.json')
+        return os.path.join(zones_dir, f'{identifier}.json')
 
     @classmethod
     def from_json(cls, data: ZoneDict) -> 'Zone':

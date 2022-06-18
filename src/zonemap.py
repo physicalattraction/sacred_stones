@@ -4,11 +4,16 @@ from typing import List, Dict, TypedDict, Tuple, Set, Literal, Optional
 
 import pygame
 
+import constants
 from constants import DATA_DIR
 from environment import Obstacle, Walkable
 
 OBSTACLE = 'obstacle'
 WALKABLE = 'walkable'
+NORTH = 'north'
+EAST = 'east'
+SOUTH = 'south'
+WEST = 'west'
 
 
 class MonsterAssignment(TypedDict):
@@ -32,15 +37,18 @@ class ZoneMap:
     Represents the environment of a zone
     """
 
+    # Mapping from direction (north/east/south/west) to zone identifier
+    neighbor_zones: Dict[Literal[NORTH, EAST, SOUTH, WEST], str]
+
     _obstacles: List[Obstacle]
     _walkables: List[Walkable]
-
     _obstacle_coordinates: Set[Tuple[int, int]]
     _walkable_coordinates: Set[Tuple[int, int]]
 
     _all_sprites: Optional[pygame.sprite.Group]
 
-    def __init__(self, obstacles: List[Obstacle], walkables: List[Walkable]):
+    def __init__(self, obstacles: List[Obstacle], walkables: List[Walkable], neighbor_zones: Dict[str, str]):
+        self.neighbor_zones = neighbor_zones
         self._obstacles = obstacles
         self._walkables = walkables
 
@@ -68,7 +76,8 @@ class ZoneMap:
                     walkables.append(Walkable(x=x, y=y))
                 else:
                     raise ValueError(f'Tile {tile} is neither obstacle nor walkable')
-        return cls(obstacles=obstacles, walkables=walkables)
+        zone_info = cls.read_info(identifier)
+        return cls(obstacles=obstacles, walkables=walkables, **zone_info)
 
     @staticmethod
     def read_map(identifier: str) -> Tuple[ZoneMapRepr, MapLegend]:
@@ -87,11 +96,35 @@ class ZoneMap:
             world_map = [i.strip() for i in f.readlines()]
         return world_map, map_legend
 
+    @staticmethod
+    def read_info(identifier: str) -> Dict[str, str]:
+        map_legend_file = os.path.join(DATA_DIR, 'original', 'zones', identifier, 'info.json')
+        with open(map_legend_file, 'r') as f:
+            return json.load(f)
+
     @property
     def all_sprites(self) -> pygame.sprite.Group():
         if not self._all_sprites:
             self._all_sprites = pygame.sprite.Group(*self._obstacles, *self._walkables)
         return self._all_sprites
+
+    def neighbor_zone_at(self, x: int, y: int) -> Optional[str]:
+        """
+        Return the zone identifier of the neighbor that (x, y) would be at
+        """
+
+        if x < 0:
+            print(f'Moving west to {self._neighbor_zones["west"]}')
+            return self._neighbor_zones['west']
+        if x >= constants.NR_BLOCKS_WIDE:
+            print(f'Moving east to {self._neighbor_zones["east"]}')
+            return self._neighbor_zones['east']
+        if y < 0:
+            print(f'Moving north to {self._neighbor_zones["north"]}')
+            return self._neighbor_zones['north']
+        if y >= constants.NR_BLOCKS_HIGH:
+            print(f'Moving south to {self._neighbor_zones["south"]}')
+            return self._neighbor_zones['south']
 
     def tile_is_obstacle(self, x: int, y: int) -> bool:
         return (x, y) in self._obstacle_coordinates

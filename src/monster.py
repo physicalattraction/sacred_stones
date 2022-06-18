@@ -34,6 +34,9 @@ class Monster(Creature):
     IMAGE = constants.MONSTER_IMG
     IMAGE_DEAD = constants.MONSTER_IMG_DEAD
 
+    def __str__(self):
+        return f'{self.kind} {self.name}'
+
 
 with open(MONSTER_DEFINITION_FILE, 'r') as f:
     print('Reading monster definition file')

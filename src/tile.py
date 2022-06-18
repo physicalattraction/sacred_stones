@@ -48,10 +48,10 @@ class Tile(pygame.sprite.Sprite, ABC):
 class OrientedTile(Tile, ABC):
     direction: Direction
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, direction: int, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.direction = constants.DOWN  # This is how the initial image is oriented
-        self.orient_towards(constants.RIGHT)  # This is how the _player should be oriented
+        self.orient_towards(direction)  # This is how the tile should be oriented
 
     def orient_towards(self, direction: Direction):
         angle_to_turn = direction - self.direction
