@@ -20,5 +20,9 @@
     "monster": {
       "identifier": "goblin"
     }
+  },
+  "S": {
+    "tile": "walkable",
+    "inventory": "sword"
   }
 }

@@ -34,9 +34,7 @@ class Creature(Tile, Saveable, ABC):
     max_hit_points: int
     hit_points: int
 
-    # TODO: Should these all be the initializer?
-    def __init__(self, *, hit_points: int = None,
-                 **kwargs):
+    def __init__(self, *, hit_points: int = None, **kwargs):
         self.hit_points = hit_points if hit_points is not None else self.max_hit_points
         super().__init__(**kwargs)
 

@@ -81,7 +81,7 @@ class Fight:
         roll_of_dice = random.randint(0, 99)
         if roll_of_dice <= self._monster.chance_to_hit:
             self._player.hit_points -= self._monster.calculate_damage(self._player)
-        elif self._player.is_dead():
+        if self._player.is_dead():
             print(f'{self._player} is killed by {self._monster}')
             self._keep_looping = False
 

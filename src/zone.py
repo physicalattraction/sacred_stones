@@ -6,6 +6,7 @@ import pygame
 
 from constants import DATA_DIR
 from environment import Walkable, Obstacle
+from inventory.inventory import InventoryObject, InventoryDict
 from monster.monster import MonsterDict, Monster
 from saveable import Saveable
 from zonemap import ZoneMap
@@ -19,6 +20,7 @@ class ZoneDict(TypedDict):
     identifier: str
     name: str
     monsters: List[MonsterDict]
+    objects: List[InventoryDict]
 
 
 class Zone(Saveable):
@@ -27,13 +29,15 @@ class Zone(Saveable):
     walkables: List[Walkable]
     obstacles: List[Obstacle]
     monsters: List[Monster]
+    objects: List[InventoryObject]
 
     _all_sprites: Optional[pygame.sprite.Group]
 
-    def __init__(self, identifier: str, monsters: List[Monster]):
+    def __init__(self, identifier: str, monsters: List[Monster], objects: List[InventoryObject]):
         self.map = ZoneMap.load(identifier)
         self.identifier = identifier
         self.monsters = monsters
+        self.objects = objects
 
         self._all_sprites = None
 
@@ -55,7 +59,8 @@ class Zone(Saveable):
 
         identifier = data['identifier']
         monsters = [Monster.from_json(monster) for monster in data['monsters']]
-        return cls(identifier=identifier, monsters=monsters)
+        objects = [InventoryObject.from_json(obj) for obj in data['objects']]
+        return cls(identifier=identifier, monsters=monsters, objects=objects)
 
     @classmethod
     def load(cls, identifier: str) -> 'Zone':
@@ -77,8 +82,9 @@ class Zone(Saveable):
         Return the zone state information
         """
 
-        return {'identifier': self.identifier,
-                'monsters': [monster.as_json() for monster in self.monsters]}
+        return {'identifier': self.identifier, 'name': self.name,
+                'monsters': [monster.as_json() for monster in self.monsters],
+                'objects': [obj.as_json() for obj in self.objects]}
 
     def save(self):
         """
@@ -93,7 +99,7 @@ class Zone(Saveable):
     @property
     def all_sprites(self) -> pygame.sprite.Group():
         if not self._all_sprites:
-            self._all_sprites = pygame.sprite.Group(*self.map.all_sprites, *self.monsters)
+            self._all_sprites = pygame.sprite.Group(*self.map.all_sprites, *self.monsters, *self.objects)
         return self._all_sprites
 
     @property
@@ -118,6 +124,7 @@ class Zone(Saveable):
     @classmethod
     def _init_zone_from_map(cls, identifier: str) -> 'Zone':
         monsters = []
+        objects = []
         world_map, map_legend = ZoneMap.read_map(identifier)
         for y, row in enumerate(world_map):
             for x, cell_char in enumerate(row):
@@ -127,4 +134,7 @@ class Zone(Saveable):
                     raise KeyError(f'Map character {cell_char} is not defined in map_legend') from e
                 if monster_info := cell_info.get('monster'):
                     monsters.append(Monster.from_json(monster_info, x=x, y=y))
-        return cls(identifier=identifier, monsters=monsters)
+                if inventory_info := cell_info.get('inventory'):
+                    # TODO: Continue from here, make inventory on the map work
+                    objects.append(InventoryObject.from_json(inventory_info, x=x, y=y))
+        return cls(identifier=identifier, monsters=monsters, objects=objects)

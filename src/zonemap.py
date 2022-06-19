@@ -27,6 +27,7 @@ class CellDefinition(TypedDict, total=False):
     tile: Literal['obstacle', 'walkable']
     player: bool
     monster: MonsterAssignment
+    inventory: str  # A single object on the map, referenced by its identifier
 
 
 ZoneMapRepr = List[str]  # Textual representation of the map
@@ -109,24 +110,6 @@ class ZoneMap:
         if not self._all_sprites:
             self._all_sprites = pygame.sprite.Group(*self._obstacles, *self._walkables)
         return self._all_sprites
-
-    def neighbor_zone_at(self, x: int, y: int) -> Optional[str]:
-        """
-        Return the zone identifier of the neighbor that (x, y) would be at
-        """
-
-        if x < 0:
-            print(f'Moving west to {self._neighbor_zones["west"]}')
-            return self._neighbor_zones['west']
-        if x >= constants.NR_BLOCKS_WIDE:
-            print(f'Moving east to {self._neighbor_zones["east"]}')
-            return self._neighbor_zones['east']
-        if y < 0:
-            print(f'Moving north to {self._neighbor_zones["north"]}')
-            return self._neighbor_zones['north']
-        if y >= constants.NR_BLOCKS_HIGH:
-            print(f'Moving south to {self._neighbor_zones["south"]}')
-            return self._neighbor_zones['south']
 
     def tile_is_obstacle(self, x: int, y: int) -> bool:
         return (x, y) in self._obstacle_coordinates

@@ -10,7 +10,7 @@ from zonemap import MonsterAssignment
 
 class MonsterDict(CreatureDict):
     """
-    JSON representation of a _monster's state
+    JSON representation of a monster's state
     """
 
     identifier: str
