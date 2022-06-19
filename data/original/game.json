@@ -10,7 +10,9 @@
     "max_damage": 4,
     "chance_to_hit": 90,
     "max_hit_points": 12,
-    "hit_points": 12
+    "hit_points": 12,
+    "gold": 100,
+    "experience": 0
   },
   "zones": {}
 }

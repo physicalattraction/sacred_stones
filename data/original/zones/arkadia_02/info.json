@@ -1,4 +1,5 @@
 {
+  "name": "Arkadia - western edge",
   "neighbor_zones": {
     "east": "arkadia_01"
   }

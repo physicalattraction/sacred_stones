@@ -14,7 +14,7 @@ from text_dialog import TextDialog
 from player import Player, PlayerDict
 from saveable import Saveable
 from environment import Obstacle, Walkable
-from utils import init_pygame
+from utils import init_pygame, display_text
 from zone import Zone
 
 
@@ -36,8 +36,9 @@ class Game(Saveable):
         init_pygame()
         self._all_sprites = None
         self._keep_looping = True
-        self._display_surface = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
-        self._display_surface.fill(constants.UGLY_PINK)
+        self._screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+        self._screen.fill(constants.UGLY_PINK)
+        self._font = pygame.font.Font(None, 30)
 
         self._resume()
 
@@ -73,11 +74,11 @@ class Game(Saveable):
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.quit()
+                self._quit()
                 return True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.quit()
+                    self._quit()
                     return True
                 if event.key == pygame.K_r:
                     # TODO: This should not be so easy, but good for debugging
@@ -104,15 +105,25 @@ class Game(Saveable):
                         print('Monster is already dead')
                         return False
                     print('Fight!!!')
-                    self.dialog_have_a_fight(monster)
+                    self._dialog_have_a_fight(monster)
                     if self._player.is_dead():
-                        self.player_died()
+                        self._player_died()
                 if zone_to_move_to:
                     self._active_zone = zone_to_move_to
                     self._zone = Zone.load(zone_to_move_to)
                     self.save()
                     self._resume()
                 self.save()
+
+    def draw(self):
+        self.all_sprites.update()
+        self.all_sprites.draw(self._screen)
+        height = display_text(self._screen, text=f'XP: {self._player.experience}', font=self._font,
+                              width_offset=constants.SCREEN_WIDTH - 120, height_offset=20, line_width=60,
+                              color=constants.YELLOW, shadow_color=constants.BLACK)
+        display_text(self._screen, text=f'Gold: {self._player.gold}', font=self._font,
+                     width_offset=constants.SCREEN_WIDTH - 120, height_offset=20 + height, line_width=60,
+                     color=constants.YELLOW, shadow_color=constants.BLACK)
 
     @staticmethod
     def _get_saved_data() -> GameDict:
@@ -134,15 +145,11 @@ class Game(Saveable):
         self._player = Player.from_json(data['player'])
         self._zone = Zone.load(data['active_zone'])
 
-    def draw_stuff(self):
-        self.all_sprites.update()
-        self.all_sprites.draw(self._display_surface)
-
-    def quit(self):
+    def _quit(self):
         pygame.quit()
         sys.exit()
 
-    def dialog_have_a_fight(self, monster):
+    def _dialog_have_a_fight(self, monster):
         fight_dialog = Fight(self._player, monster)
         fight_dialog.main()
         self.save()
@@ -154,8 +161,9 @@ class Game(Saveable):
         self._keep_looping = True
         data = self._get_saved_data()
         self._set_data(data)
+        pygame.display.set_caption(f'{constants.TITLE} - {self._zone.name}')
 
-    def player_died(self):
+    def _player_died(self):
         TextDialog.show('You are dead! Game over.')
         self._keep_looping = False
         init_pygame()

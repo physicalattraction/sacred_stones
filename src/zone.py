@@ -17,11 +17,13 @@ class ZoneDict(TypedDict):
     """
 
     identifier: str
+    name: str
     monsters: List[MonsterDict]
 
 
 class Zone(Saveable):
     identifier: str
+    name: str
     walkables: List[Walkable]
     obstacles: List[Obstacle]
     monsters: List[Monster]
@@ -93,6 +95,10 @@ class Zone(Saveable):
         if not self._all_sprites:
             self._all_sprites = pygame.sprite.Group(*self.map.all_sprites, *self.monsters)
         return self._all_sprites
+
+    @property
+    def name(self):
+        return self.map.name
 
     def monster_on_tile(self, x: int, y: int) -> Optional[Monster]:
         """

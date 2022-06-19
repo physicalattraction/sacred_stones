@@ -48,8 +48,9 @@ class ZoneMap:
 
     _all_sprites: Optional[pygame.sprite.Group]
 
-    def __init__(self, obstacles: List[Obstacle], walkables: List[Walkable], neighbor_zones: Dict[str, str]):
+    def __init__(self, name: str, obstacles: List[Obstacle], walkables: List[Walkable], neighbor_zones: Dict[str, str]):
         self.neighbor_zones = neighbor_zones
+        self.name = name
         self._obstacles = obstacles
         self._walkables = walkables
 

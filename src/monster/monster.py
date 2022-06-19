@@ -50,6 +50,14 @@ class Monster(Creature):
             for field in MonsterDict.__required_keys__
         }
 
+    @property
+    def gold_when_killed(self) -> int:
+        return 0
+
+    @property
+    def experience_when_killed(self) -> int:
+        return 0
+
     def _get_name(self):
         return random.choice(self.NAMES)
 

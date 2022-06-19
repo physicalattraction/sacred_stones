@@ -13,6 +13,8 @@ class PlayerDict(CreatureDict):
     """
 
     direction: int
+    gold: int
+    experience: int
 
 
 class Player(OrientedTile, Creature):
@@ -21,7 +23,7 @@ class Player(OrientedTile, Creature):
     IMAGE_DEAD = constants.PLAYER_IMG_DEAD
 
     def __init__(self, *, name: str = None, kind: str = None, armor: int, max_damage: int,
-                 chance_to_hit: int, max_hit_points: int, **kwargs):
+                 chance_to_hit: int, max_hit_points: int, gold: int, experience: int, **kwargs):
         super().__init__(**kwargs)
         self.name = name
         self.kind = kind
@@ -29,6 +31,8 @@ class Player(OrientedTile, Creature):
         self.max_damage = max_damage
         self.chance_to_hit = chance_to_hit
         self.max_hit_points = max_hit_points
+        self.gold = gold
+        self.experience = experience
 
     def move(self, direction: Direction, zone_map: ZoneMap):
         if self.is_dead():

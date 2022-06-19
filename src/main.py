@@ -11,7 +11,7 @@ def run():
 
     while True:
         game.handle_events()
-        game.draw_stuff()
+        game.draw()
         pygame.display.update()
 
 

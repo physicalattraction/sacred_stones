@@ -70,7 +70,11 @@ class Fight:
         if roll_of_dice <= self._player.chance_to_hit:
             self._monster.hit_points -= self._player.calculate_damage(self._monster)
         if self._monster.is_dead():
-            print(f'{self._player} killed {self._monster}')
+            gold_earned = self._monster.gold_when_killed
+            experience_earned = self._monster.experience_when_killed
+            self._player.gold += gold_earned
+            self._player.experience += experience_earned
+            print(f'{self._player} killed {self._monster}, gaining {gold_earned} gold and {experience_earned} XP')
             self._keep_looping = False
 
     def _monster_attacks_player(self):
@@ -93,8 +97,8 @@ class Fight:
         player_list = [f'{self._player}:', f'Hit Points: {self._player.hit_points}', f'Armor: {self._player.armor}',
                        f'Max damage: {self._player.max_damage}', f'Chance to hit: {self._player.chance_to_hit}']
         player_height = utils.display_text(self._screen, player_list, self._font, width_offset=20,
-                                           height_offset=250, line_width=60,
-                                           color=constants.YELLOW, shadow_color=constants.BLACK)
+                                              height_offset=250, line_width=60,
+                                              color=constants.YELLOW, shadow_color=constants.BLACK)
 
         action_list = ['What would you like to do?', 'H = Hit',
                        f'X = Flee (Fleeing will cost {self.FLEE_PENALTY} hitpoints)']

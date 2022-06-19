@@ -17,6 +17,10 @@ class GiantBat(Monster):
         self.max_hit_points = 10
         super().__init__(**kwargs)
 
+    @property
+    def experience_when_killed(self) -> int:
+        return 20
+
     def __str__(self):
         return f'{self.kind} {self.name}'
 
